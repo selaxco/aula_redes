@@ -1,90 +1,86 @@
+###############################################################################
+#                               Importações                                   #
+###############################################################################
 import random
 
-def funcao_objetivo_CB(individuo): #computa uma métrica do objetivo; nesse caso, é computado a soma dos valores de cada gene
-    '''computa a função objetivo no problema das caixas binárias
-    
-    Args: 
-        indivíduos: lista contendo os genes das caixas binárias
-        
-    Return valor que representa a soma dos genes de cada indivíduo '''
-    return sum(individuo) + 1 # o + 1 foi adicinado para não dar erro na hora de considerar um peso igual a zero
 
-# criar uma lista para representar os indivíduos
-# cada elemento da lista é um gene
-# cada gene pode ser 1 ou 0
+###############################################################################
+#                                 Suporte                                     #
+###############################################################################
 
-def funcao_objetivo_pop_cb(populacao):
-    '''Calcula a função objetivo para cada indivíduo da população.
+def verifica_vogais(individuo): # Experimento GA.05
+    '''
+    individuo: uma lista representando um candidato do palíndromo
     
+    return: True se existir uma vogal no candidato e False se não existir
+    '''
+    VOGAIS = "aeiou"
+    
+    for i in individuo:
+        if i in VOGAIS:
+            return True
+    return False
+
+
+def distancia_entre_dois_pontos(a, b):
+    """Computa a distância Euclidiana entre dois pontos em R^2
     Args:
-        populacao: lista com todos os individuos da população
-    
-    Returns: 
-        '''
-    fitness = []
-    for individuo in populacao:
-        fobj = funcao_objetivo_CB(individuo)
-        fitness.append(fobj)
-    
-    return fitness
-
-
-def funcao_objetivo_cnb(individuo):
-    """Computa a função objetivo no problema das caixas não-binárias.
-    Args:
-      individiuo: lista contendo os genes das caixas não-binárias
-    Return:
-      Um valor representando a soma dos genes do individuo.
-    """
-    return sum(individuo)
-
-
-
-def funcao_objetivo_senha(individuo, senha_verdadeira):
-    """Computa a funcao objetivo de um individuo no problema da senha
-    Args:
-      individiuo: lista contendo as letras da senha
-      senha_verdadeira: a senha que você está tentando descobrir
+      a: lista contendo as coordenadas x e y de um ponto.
+      b: lista contendo as coordenadas x e y de um ponto.
     Returns:
-      A "distância" entre a senha proposta e a senha verdadeira. Essa distância
-      é medida letra por letra. Quanto mais distante uma letra for da que
-      deveria ser, maior é essa distância.
+      Distância entre as coordenadas dos pontos `a` e `b`.
     """
-    diferenca = 0
 
-    for letra_candidato, letra_oficial in zip(individuo, senha_verdadeira):
-        diferenca = diferenca + abs(ord(letra_candidato) - ord(letra_oficial))
+    x1 = a[0]
+    x2 = b[0]
+    y1 = a[1]
+    y2 = b[1]
 
-    return diferenca
+    dist = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** (1 / 2)
 
-def funcao_objetivo_pop_cnb(populacao):
-    """Calcula a funcao objetivo para todos os membros de uma população
+    return dist
+
+
+def distancia_entre_dois_pontos(a, b):
+    """Computa a distância Euclidiana entre dois pontos em R^2
     Args:
-      populacao: lista com todos os individuos da população
-    Return:
-      Lista de valores represestando a fitness de cada individuo da população.
-    """
-    fitness = []
-    for individuo in populacao:
-        fobj = funcao_objetivo_cnb(individuo)
-        fitness.append(fobj)
-    return fitness
-
-
-def funcao_objetivo_pop_senha(populacao, senha_verdadeira):
-    """Computa a funcao objetivo de uma populaçao no problema da senha.
-    Args:
-      populacao: lista com todos os individuos da população
-      senha_verdadeira: a senha que você está tentando descobrir
+      a: lista contendo as coordenadas x e y de um ponto.
+      b: lista contendo as coordenadas x e y de um ponto.
     Returns:
-      Lista contendo os valores da métrica de distância entre senhas.
+      Distância entre as coordenadas dos pontos `a` e `b`.
     """
-    resultado = []
 
-    for individuo in populacao:
-        resultado.append(funcao_objetivo_senha(individuo, senha_verdadeira))
+    x1 = a[0]
+    x2 = b[0]
+    y1 = a[1]
+    y2 = b[1]
 
-    return resultado
+    dist = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** (1 / 2)
+
+    return dist
+
+def cria_cidades(n):
+    """Cria um dicionário aleatório de cidades com suas posições (x,y).
+    Args:
+      n: inteiro positivo
+        Número de cidades que serão visitadas pelo caixeiro.
+    Returns:
+      Dicionário contendo o nome das cidades como chaves e a coordenada no plano
+      cartesiano das cidades como valores.
+    """
+
+    cidades = {}
+
+    for i in range(n):
+        cidades[f"Cidade {i}"] = (random.random(), random.random())
+
+    return cidades
+
+
+###############################################################################
+#                                    Genes                                    #
+###############################################################################
+
 
 def gene_CB():
     '''gera um gene válido para o problema das caixas binárias
@@ -113,6 +109,12 @@ def gene_letra(letras):
     """
     letra = random.choice(letras)
     return letra
+
+
+###############################################################################
+#                                  Indivíduos                                 #
+###############################################################################
+
 
 def individuo_CB(n):
     '''gera um indivíduo para o problema das caixas binárias
@@ -160,6 +162,39 @@ def individuo_senha(tamanho_senha, letras):
 
     return candidato
 
+def individuo_cv(cidades):
+    """Sorteia um caminho possível no problema do caixeiro viajante
+    Args:
+      cidades:
+        Dicionário onde as chaves são os nomes das cidades e os valores são as
+        coordenadas das cidades.
+    Return:
+      Retorna uma lista de nomes de cidades formando um caminho onde visitamos
+      cada cidade apenas uma vez.
+    """
+    pass
+
+###############################################################################
+#                                  População                                  #
+###############################################################################
+
+def populacao_inicial_cv(tamanho, cidades):
+    """Cria população inicial no problema do caixeiro viajante.
+    Args
+      tamanho:
+        Tamanho da população.
+      cidades:
+        Dicionário onde as chaves são os nomes das cidades e os valores são as
+        coordenadas das cidades.
+    Returns:
+      Lista com todos os indivíduos da população no problema do caixeiro
+      viajante.
+    """
+    populacao = []
+    for _ in range(tamanho):
+        populacao.append(individuo_cv(cidades))
+    return populacao
+
 def população_cb(tamanho, n):
     '''Cria uma população no problema das caixas binárias. 
     
@@ -205,8 +240,12 @@ def populacao_inicial_senha(tamanho, tamanho_senha, letras):
     return populacao
 
 
+###############################################################################
+#                                   Seleção                                   #
+###############################################################################
+
 def selecao_roleta_max(populacao, fitness):
-    '''Seleciona indivpiduos d euma população usando o método da roleta. 
+    '''Seleciona indivpiduos de uma população usando o método da roleta. 
     
     Nota: apenas funciona para problemas de maximização.
     
@@ -258,6 +297,9 @@ def selecao_torneio_min(populacao, fitness, tamanho_torneio=3):
 
     return selecionados
 
+###############################################################################
+#                                  Cruzamento                                 #
+###############################################################################
 
 def cruzamento_ponto_simples(pai, mae):
     '''Operador de cruzamento de ponto simples.
@@ -273,6 +315,28 @@ def cruzamento_ponto_simples(pai, mae):
     filho2 = mae[:ponto_de_corte] + pai[ponto_de_corte:]
     
     return filho1, filho2
+
+def cruzamento_ordenado(pai, mae):
+    """Operador de cruzamento ordenado.
+    Neste cruzamento, os filhos mantém os mesmos genes que seus pais tinham,
+    porém em uma outra ordem. Trata-se de um tipo de cruzamento útil para
+    problemas onde a ordem dos genes é importante e não podemos alterar os genes
+    em si. É um cruzamento que pode ser usado no problema do caixeiro viajante.
+    Ver pág. 37 do livro do Wirsansky.
+    Args:
+      pai: uma lista representando um individuo
+      mae : uma lista representando um individuo
+    Returns:
+      Duas listas, sendo que cada uma representa um filho dos pais que foram os
+      argumentos. Estas listas mantém os genes originais dos pais, porém altera
+      a ordem deles
+    """
+    pass
+
+
+###############################################################################
+#                                   Mutação                                   #
+###############################################################################
 
 def mutacao_cb(individuo):
     '''Realiza a mutação de um gene no problema das caixas binárias.
@@ -315,55 +379,159 @@ def mutacao_senha(individuo, letras):
     individuo[gene] = gene_letra(letras)
     return individuo
 
-'''============================================
-        FUNÇÕES PARA O EXPERIMENTO GA.05
-============================================='''
-
-# gene_letra(letras)
-# individuo_senha(tamanho_senha, letras)
-
-def verifica_vogais(individuo):
-    '''
-    individuo: uma lista representando um candidato do palíndromo
-    
-    return: True se existir uma vogal no candidato e False se não existir
-    '''
+def mutacao_de_troca(individuo):
+    """Troca o valor de dois genes.
+    Args:
+      individuo: uma lista representado um individuo.
+    Return:
+      O indivíduo recebido como argumento, porém com dois dos seus genes
+      trocados de posição.
+    """
     pass
+
+###############################################################################
+#                         Função objetivo - indivíduos                        #
+###############################################################################
+
+def funcao_objetivo_cv(individuo, cidades):
+    """Computa a funcao objetivo de um individuo no problema do caixeiro viajante.
+    Args:
+      individiuo:
+        Lista contendo a ordem das cidades que serão visitadas
+      cidades:
+        Dicionário onde as chaves são os nomes das cidades e os valores são as
+        coordenadas das cidades.
+    Returns:
+      A distância percorrida pelo caixeiro seguindo o caminho contido no
+      `individuo`. Lembrando que após percorrer todas as cidades em ordem, o
+      caixeiro retorna para a cidade original de onde começou sua viagem.
+    """
+
+    distancia = 0
+
+    # preencher o código
+
+    return distancia
+
+
+def funcao_objetivo_CB(individuo): #computa uma métrica do objetivo; nesse caso, é computado a soma dos valores de cada gene
+    '''computa a função objetivo no problema das caixas binárias
+    
+    Args: 
+        indivíduos: lista contendo os genes das caixas binárias
+        
+    Return valor que representa a soma dos genes de cada indivíduo '''
+    return sum(individuo) + 1 # o + 1 foi adicinado para não dar erro na hora de considerar um peso igual a zero
+
+# criar uma lista para representar os indivíduos
+# cada elemento da lista é um gene
+# cada gene pode ser 1 ou 0
+
+
+def funcao_objetivo_cnb(individuo):
+    """Computa a função objetivo no problema das caixas não-binárias.
+    Args:
+      individiuo: lista contendo os genes das caixas não-binárias
+    Return:
+      Um valor representando a soma dos genes do individuo.
+    """
+    return sum(individuo)
+
+def funcao_objetivo_senha(individuo, senha_verdadeira):
+    """Computa a funcao objetivo de um individuo no problema da senha
+    Args:
+      individiuo: lista contendo as letras da senha
+      senha_verdadeira: a senha que você está tentando descobrir
+    Returns:
+      A "distância" entre a senha proposta e a senha verdadeira. Essa distância
+      é medida letra por letra. Quanto mais distante uma letra for da que
+      deveria ser, maior é essa distância.
+    """
+    diferenca = 0
+
+    for letra_candidato, letra_oficial in zip(individuo, senha_verdadeira):
+        diferenca = diferenca + abs(ord(letra_candidato) - ord(letra_oficial))
+
+    return diferenca
 
 def funcao_objetivo_palindromo(individuo):
     '''
-    Para ser um palíndromo, a primeira letra precisa ser igual a última, a segunda letra igual a penúltima e por assim   vai. Nesse caso, a funcao irá atribuir valores para as letras e a soma das diferenças entre os valores que devem ser iguais será o fitness. 
+    Para ser um palíndromo, a primeira letra precisa ser igual a última, a segunda letra igual a penúltima e por assim   vai. Nesse caso, a função irá atribuir valores para as letras e a soma das diferenças entre os valores que devem ser iguais será o fitness. A variável x será responsável por armazenar a metade do tamanho do indivíduo e, portanto, auxiliar na comparação entre as posições no vetor. Por exemplo, para um vetor v = ['a', 'r', 'a','r','a'], compararíamos v[0] com v[-1] e v[1] com v[-2]. 
     
     Args:
     individuo: lista representando um candidato do palíndromo já contendo pelo menos uma vogal
     
-    return: fitness do indivíduo
+    return: Fitness do indivíduo. Essa métrica é dada pela diferença entre os valores de cada letra.
     '''
-    pass
+    metade_individuo = int(len(individuo)/2) # a metade do tamanho do individuo será utilizado para compararmos se as letras são iguais 
+    num = -1 
+    diferenca = 0
+    
+    for i in range(metade_individuo):
+        if abs(ord(individuo[i]) - ord(individuo[num])) != 0:
+            diferenca = diferenca + 1
+        num = num - 1
+    return diferenca
 
-def funcao_objetivo_palindromo(individuo):
-    '''
-    Para ser um palíndromo, a primeira letra precisa ser igual a última, a segunda letra igual a penúltima e por assim   vai. Nesse caso, a funcao irá atribuir valores para as letras e a soma das diferenças entre os valores que devem ser iguais será o fitness. 
+
+###############################################################################
+#                         Função objetivo - população                         #
+###############################################################################
+
+def funcao_objetivo_pop_cb(populacao):
+    '''Calcula a função objetivo para cada indivíduo da população.
     
     Args:
-    individuo: lista representando um candidato do palíndromo já contendo pelo menos uma vogal
+        populacao: lista com todos os individuos da população
     
-    return: fitness do indivíduo
-    '''
-    pass
+    Returns: 
+        '''
+    fitness = []
+    for individuo in populacao:
+        fobj = funcao_objetivo_CB(individuo)
+        fitness.append(fobj)
+    
+    return fitness
 
-def populacao_palindromo(tamanho_populacao, num_genes, letras):
-    '''
-    Cria a população inicial no problema de busca por palíndromos
-    
+def funcao_objetivo_pop_cnb(populacao):
+    """Calcula a funcao objetivo para todos os membros de uma população
     Args:
-    
-    Return: uma lista com indivíduos
-    '''
-    pass
+      populacao: lista com todos os individuos da população
+    Return:
+      Lista de valores represestando a fitness de cada individuo da população.
+    """
+    fitness = []
+    for individuo in populacao:
+        fobj = funcao_objetivo_cnb(individuo)
+        fitness.append(fobj)
+    return fitness
 
-def selecao_palindromo(populacao):
-    '''
-    
-    '''
-    pass
+def funcao_objetivo_pop_senha(populacao, senha_verdadeira):
+    """Computa a funcao objetivo de uma populaçao no problema da senha.
+    Args:
+      populacao: lista com todos os individuos da população
+      senha_verdadeira: a senha que você está tentando descobrir
+    Returns:
+      Lista contendo os valores da métrica de distância entre senhas.
+    """
+    resultado = []
+
+    for individuo in populacao:
+        resultado.append(funcao_objetivo_senha(individuo, senha_verdadeira))
+
+    return resultado
+
+def funcao_objetivo_pop_palindromo(populacao):
+    """Computa a funcao objetivo de uma populaçao no problema do palíndromo.
+    Args:
+      populacao: lista com todos os individuos da população
+    Returns:
+      Lista contendo os valores da métrica de distância entre senhas.
+    """
+    resultado = []
+
+    for individuo in populacao:
+        fitness = funcao_objetivo_palindromo(individuo)
+        resultado.append(fitness)
+        
+    return resultado
